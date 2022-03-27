@@ -1,5 +1,6 @@
 #include "types.h"
 #include "gdt.h"
+#include "interrupts.h"
 
 void printf(const char *str) {
 	unsigned short *videoMemory = (unsigned short*)0xb8000;
@@ -39,5 +40,7 @@ void printf(const char *str) {
 extern "C" void kernelMain(void *multiboot_structure, unsigned int magic_number) {
 	printf("Hello, \n\tWorld!");
 	GlobalDescriptorTable gdt;
+	InterruptManager interrupts(&gdt);
+	interrupts.Activate();
 	while(1);
 }
