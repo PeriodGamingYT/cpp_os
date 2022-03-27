@@ -30,3 +30,6 @@
 *.exe
 *.out
 *.app
+
+mykernel.bin
+mykernel.iso
