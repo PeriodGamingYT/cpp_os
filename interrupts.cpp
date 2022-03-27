@@ -36,7 +36,6 @@ InterruptManager::InterruptManager(GlobalDescriptorTable *gdt)
 		picMasterData.Write(0x20);
 		picSlaveCommand.Write(0x11);
 		picSlaveData.Write(0x28);
-		
 		picMasterData.Write(0x04);
 		picSlaveData.Write(0x02);
 		picMasterData.Write(0x01);
