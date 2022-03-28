@@ -120,6 +120,7 @@ u32 KeyboardDriver::HandleInterrupt(u32 esp) {
 		alt = false;
 		meta = false;
 		capsLockDown = false;
+		backspaceDown = false;
 	}
 	
 	return esp;
