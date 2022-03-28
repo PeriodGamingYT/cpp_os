@@ -1,10 +1,11 @@
 #include "types.h"
 #include "gdt.h"
 #include "interrupts.h"
+#include "keyboard.h"
 
+static u8 x = 0, y = 0;
 void printf(const char *str) {
 	unsigned short *videoMemory = (unsigned short*)0xb8000;
-	static u8 x = 0, y = 0;
 	for(int i = 0; str[i] != '\0'; i++) {
 		switch(str[i]) {
 			case '\t':
@@ -41,6 +42,7 @@ extern "C" void kernelMain(void *multiboot_structure, unsigned int magic_number)
 	printf("Hello, \n\tWorld!");
 	GlobalDescriptorTable gdt;
 	InterruptManager interrupts(&gdt);
+	KeyboardDriver keyboard(&interrupts);
 	interrupts.Activate();
 	while(1);
 }

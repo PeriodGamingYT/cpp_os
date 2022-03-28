@@ -5,8 +5,23 @@
 #include "port.h"
 #include "gdt.h"
 
-class InterruptManager {
+class InterruptManager;
+
+class InterruptHandler {
 	protected:
+		u8 interruptNumber;
+		InterruptManager *interruptManager;
+		InterruptHandler(u8 interruptNumber, InterruptManager *interruptManager);
+		~InterruptHandler();
+	public:
+		virtual u32 HandleInterrupt(u32 esp);
+};
+
+class InterruptManager {
+	friend class InterruptHandler;
+	protected:
+		static InterruptManager *ActiveInterruptManager;
+		InterruptHandler *handlers[256];
 		struct GateDescriptor {
 			u16 handlerAddressLowBits;
 			u16 gdt_codeSegmentSelector;
@@ -38,8 +53,9 @@ class InterruptManager {
 		InterruptManager(GlobalDescriptorTable *gdt);
 		~InterruptManager();
 		void Activate();
-		
+		void Deactivate();
 		static u32 HandleInterrupt(u8 interruptNumber, u32 esp);
+		u32 DoHandleInterrupt(u8 interruptNumber, u32 esp);
 		static void InterruptIgnore();
 		static void HandleInterruptRequest0x00();
 		static void HandleInterruptRequest0x01();
