@@ -8,6 +8,7 @@ KeyboardDriver::KeyboardDriver(InterruptManager *manager)
 	shift = false;
 	capsLock = false;
 	capsLockDown = false;
+	backspaceDown = false;
 	alt = false;
 	control = false;
 	key = '\0';
@@ -27,9 +28,10 @@ KeyboardDriver::~KeyboardDriver() {}
 
 void printf(const char *);
 void printChar(char);
+void printGoBack(u32);
 
 bool KeyboardDriver::IsPrintable() {
-	return !control && !alt && !meta && !shift && !capsLockDown;
+	return !control && !alt && !meta && !shift && !capsLockDown && !backspaceDown;
 }
 
 u32 KeyboardDriver::HandleInterrupt(u32 esp) {
@@ -91,7 +93,7 @@ u32 KeyboardDriver::HandleInterrupt(u32 esp) {
 			case 0x5B: case 0x5C: meta = false; // Meta.
 			case 0x38: alt = true; break; // Alt.
 			case 0x3A: capsLock = !capsLock; capsLockDown = true; break; // Caps Lock.
-			case 0x0E: break; // Backspace.
+			case 0x0E: backspaceDown = true; // Backspace.
 			case 0x01: break; // Escape.
 			case 0xFA: break; // Key hold thing.
 			
@@ -107,6 +109,10 @@ u32 KeyboardDriver::HandleInterrupt(u32 esp) {
 
 		if(IsPrintable()) {
 			printChar(key);
+		} else if(backspaceDown) {
+			printGoBack(1);
+			printChar(' ');
+			printGoBack(1);
 		}
 	} else {
 		shift = false;

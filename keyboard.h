@@ -16,6 +16,7 @@ class KeyboardDriver : public InterruptHandler {
 		bool shift;
 		bool capsLock;
 		bool capsLockDown;
+		bool backspaceDown;
 		char key;
 		bool IsPrintable();
 		KeyboardDriver(InterruptManager *manager);

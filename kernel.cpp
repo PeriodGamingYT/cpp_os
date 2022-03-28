@@ -44,6 +44,20 @@ void printChar(char c) {
 	printf(s);
 }
 
+void printGoBack(u32 amount) {
+	if(amount > 80 * 24) {
+		return; // Can't overflow back to normal.
+	}
+	
+	y -= (u32)(amount / 80);
+	if(y > 24) { // Unsigned int overflow.
+		x = 0;
+		return;
+	}
+
+	x -= amount - ((u32)(amount / 80) * 80);
+}
+
 extern "C" void kernelMain(void *multiboot_structure, unsigned int magic_number) {
 	printf("Hello, \n\tWorld!");
 	GlobalDescriptorTable gdt;
