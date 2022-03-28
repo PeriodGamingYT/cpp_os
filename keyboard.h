@@ -10,6 +10,14 @@ class KeyboardDriver : public InterruptHandler {
 		Port8Bit dataPort;
 		Port8Bit commandPort;
 	public:
+		bool meta;
+		bool control;
+		bool alt;
+		bool shift;
+		bool capsLock;
+		bool capsLockDown;
+		char key;
+		bool IsPrintable();
 		KeyboardDriver(InterruptManager *manager);
 		~KeyboardDriver();
 		virtual u32 HandleInterrupt(u32 esp);

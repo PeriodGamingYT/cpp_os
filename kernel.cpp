@@ -38,6 +38,12 @@ void printf(const char *str) {
 	}
 }
 
+void printChar(char c) {
+	char *s = " ";
+	s[0] = c;
+	printf(s);
+}
+
 extern "C" void kernelMain(void *multiboot_structure, unsigned int magic_number) {
 	printf("Hello, \n\tWorld!");
 	GlobalDescriptorTable gdt;
