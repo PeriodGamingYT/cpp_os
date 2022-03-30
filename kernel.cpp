@@ -83,16 +83,21 @@ class PrintfKeyboardEventHandler : public KeyboardEventHandler {
 
 class PrintfMouseEventHandler : public MouseEventHandler {
 	public:
-		void OnMouseBeforeMove(i8 x, i8 y) {
+		void OnMouseSetup() {
 			u16* videoMemory = (u16*)0xb8000;
-			videoMemory[80*y+x] = 
-				(videoMemory[80*y+x] & 0x0F00) << 4
-				| (videoMemory[80*y+x] & 0xF000) >> 4
-				| (videoMemory[80*y+x] & 0x00FF);
+			videoMemory[0] = 
+				(videoMemory[0] & 0x0F00) << 4
+				| (videoMemory[0] & 0xF000) >> 4
+				| (videoMemory[0] & 0x00FF);
 		}
-
-		void OnMouseAfterMove(i8 x, i8 y) {
+		
+		void OnMouseMove(i8 oldX, i8 oldY, i8 x, i8 y) {
 			u16* videoMemory = (u16*)0xb8000;
+			videoMemory[80*oldY+oldX] = 
+				(videoMemory[80*oldY+oldX] & 0x0F00) << 4
+				| (videoMemory[80*oldY+oldX] & 0xF000) >> 4
+				| (videoMemory[80*oldY+oldX] & 0x00FF);
+
 			videoMemory[80*y+x] = 
 				(videoMemory[80*y+x] & 0x0F00) << 4
 				| (videoMemory[80*y+x] & 0xF000) >> 4

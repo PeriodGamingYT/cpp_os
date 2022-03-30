@@ -9,9 +9,10 @@
 class MouseEventHandler {
 	public:
 		MouseEventHandler();
-		virtual void OnMouseBeforeMove(i8 x, i8 y);
-		virtual void OnMouseAfterMove(i8 x, i8 y);
+		virtual void OnMouseMove(i8 oldX, i8 oldY, i8 x, i8 y);
 		virtual void OnMouseButtonDown(u8 button);
+		virtual void OnMouseButtonUp(u8 button);
+		virtual void OnMouseSetup();
 };
 
 class MouseDriver : public InterruptHandler, public Driver {
