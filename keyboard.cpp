@@ -1,9 +1,26 @@
 #include "keyboard.h"
 
-KeyboardDriver::KeyboardDriver(InterruptManager *manager) 
+KeyboardEventHandler::KeyboardEventHandler() {}
+void KeyboardEventHandler::OnKeyUp(char key) {}
+void KeyboardEventHandler::OnKeyDown(char key) {}
+void KeyboardEventHandler::OnDelete() {}
+void KeyboardEventHandler::OnCapsLock(bool capsLock) {}
+void KeyboardEventHandler::OnEscape() {}
+void KeyboardEventHandler::OnAlt() {}
+void KeyboardEventHandler::OnControl() {}
+void KeyboardEventHandler::OnShift() {}
+void KeyboardEventHandler::OnMeta() {}
+
+KeyboardDriver::KeyboardDriver(InterruptManager *manager, KeyboardEventHandler *handler) 
 	: InterruptHandler(0x21, manager),
 		dataPort(0x60),
 		commandPort(0x64) {
+	this->handler = handler;
+}
+
+KeyboardDriver::~KeyboardDriver() {}
+
+void KeyboardDriver::Activate() {
 	meta = false;
 	shift = false;
 	capsLock = false;
@@ -11,6 +28,7 @@ KeyboardDriver::KeyboardDriver(InterruptManager *manager)
 	backspaceDown = false;
 	alt = false;
 	control = false;
+	escapeDown = false;
 	key = '\0';
 	while(commandPort.Read() & 0x1) {
 		dataPort.Read();
@@ -24,20 +42,31 @@ KeyboardDriver::KeyboardDriver(InterruptManager *manager)
 	dataPort.Write(0xF4);
 }
 
-KeyboardDriver::~KeyboardDriver() {}
-
 void printf(const char *);
 void printChar(char);
 void printGoBack(u32);
+void printfHex(u8);
 
 bool KeyboardDriver::IsPrintable() {
-	return !control && !alt && !meta && !shift && !capsLockDown && !backspaceDown;
+	return !control && !alt && !meta && !shift && !capsLockDown && !backspaceDown && !escapeDown;
+}
+
+char uppercaseChar(char key) {
+	if(key >= 'a' && key <= 'z') {
+		return key - 32;
+	}
+
+	return key;
 }
 
 u32 KeyboardDriver::HandleInterrupt(u32 esp) {
-	u8 key = dataPort.Read();
-	if(key < 0x80) {
-		switch(key) {
+	u8 dataReadKey = dataPort.Read();
+	if(handler == 0) {
+		return esp;
+	}
+	
+	if(dataReadKey < 0x80) {
+		switch(dataReadKey) {
 			case 0x02: key = ('1'); break;
 			case 0x03: key = ('2'); break;
 			case 0x04: key = ('3'); break;
@@ -88,39 +117,34 @@ u32 KeyboardDriver::HandleInterrupt(u32 esp) {
 			case 0x39: key = (' '); break;
 			case 0x0F: key = ('\t'); break;
 			case 0x45: case 0xC5: break;
-			case 0x2A: case 0x36: shift = true; break; // Shift.
-			case 0x1D: control = true; break; // Control.
-			case 0x5B: case 0x5C: meta = false; // Meta.
-			case 0x38: alt = true; break; // Alt.
-			case 0x3A: capsLock = !capsLock; capsLockDown = true; break; // Caps Lock.
-			case 0x0E: backspaceDown = true; // Backspace.
-			case 0x01: break; // Escape.
+			case 0x2A: case 0x36: shift = true; handler->OnShift(); break; // Shift.
+			case 0x1D: control = true; handler->OnControl(); break; // Control.
+			case 0x5B: case 0x5C: meta = false; handler->OnMeta(); break;// Meta.
+			case 0x38: alt = true; handler->OnAlt(); break; // Alt.
+			case 0x3A: capsLock = !capsLock; capsLockDown = true; handler->OnCapsLock(capsLock); break; // Caps Lock.
+			case 0x0E: backspaceDown = true; handler->OnDelete(); break; // Backspace.
+			case 0x01: escapeDown = true; handler->OnEscape(); break; // Escape.
 			case 0xFA: break; // Key hold thing.
 			
 			// The keycodes you get are absolutely awful.
 			default:
-				char *message = "keyboard 0x00 ";
-				const char *hex = "0123456789ABCDEF";
-				message[11] = hex[(key >> 4) & 0x0F];
-				message[12] = hex[key & 0x0F];
-				printf(message);
+				printf("Unhandled Keycode ");
+				printfHex(dataReadKey);
 				break;
 		}
 
+		key = capsLock ? uppercaseChar(key) : key;
 		if(IsPrintable()) {
-			printChar(key);
-		} else if(backspaceDown) {
-			printGoBack(1);
-			printChar(' ');
-			printGoBack(1);
+			handler->OnKeyDown(key);;
 		}
 	} else {
+		key = '\0';
 		shift = false;
-		capsLock = false;
 		alt = false;
 		meta = false;
 		capsLockDown = false;
 		backspaceDown = false;
+		escapeDown = false;
 	}
 	
 	return esp;
