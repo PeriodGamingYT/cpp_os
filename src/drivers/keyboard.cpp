@@ -1,5 +1,6 @@
-#include "keyboard.h"
+#include <drivers/keyboard.h>
 
+using namespace drivers;
 KeyboardEventHandler::KeyboardEventHandler() {}
 void KeyboardEventHandler::OnKeyUp(char key) {}
 void KeyboardEventHandler::OnKeyDown(char key) {}
@@ -11,8 +12,8 @@ void KeyboardEventHandler::OnControl() {}
 void KeyboardEventHandler::OnShift() {}
 void KeyboardEventHandler::OnMeta() {}
 
-KeyboardDriver::KeyboardDriver(InterruptManager *manager, KeyboardEventHandler *handler) 
-	: InterruptHandler(0x21, manager),
+KeyboardDriver::KeyboardDriver(hardware::InterruptManager *manager, KeyboardEventHandler *handler) 
+	: hardware::InterruptHandler(0x21, manager),
 		dataPort(0x60),
 		commandPort(0x64) {
 	this->handler = handler;

@@ -1,13 +1,14 @@
-#include "mouse.h"
+#include <drivers/mouse.h>
 
+using namespace drivers;
 MouseEventHandler::MouseEventHandler() {}
 void MouseEventHandler::OnMouseMove(i8 oldX, i8 oldY, i8 x, i8 y) {}
 void MouseEventHandler::OnMouseButtonDown(u8 button) {}
 void MouseEventHandler::OnMouseButtonUp(u8 button) {}
 void MouseEventHandler::OnMouseSetup() {}
 
-MouseDriver::MouseDriver(InterruptManager *manager, MouseEventHandler *handler) 
-	: InterruptHandler(0x2C, manager),
+MouseDriver::MouseDriver(hardware::InterruptManager *manager, MouseEventHandler *handler) 
+	: hardware::InterruptHandler(0x2C, manager),
 		dataPort(0x60),
 		commandPort(0x64) {
 	this->handler = handler;

@@ -1,5 +1,6 @@
-#include "gdt.h"
+#include <hardware/gdt.h>
 
+using namespace hardware;
 GlobalDescriptorTable::GlobalDescriptorTable() 
 	: nullSegmentSelector(0, 0, 0),
 	  unusedSegmentSelector(0, 0, 0),

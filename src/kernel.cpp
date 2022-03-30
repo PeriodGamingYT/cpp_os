@@ -1,9 +1,9 @@
-#include "types.h"
-#include "gdt.h"
-#include "driver.h"
-#include "interrupts.h"
-#include "keyboard.h"
-#include "mouse.h"
+#include <common/types.h>
+#include <hardware/gdt.h>
+#include <drivers/driver.h>
+#include <hardware/interrupts.h>
+#include <drivers/keyboard.h>
+#include <drivers/mouse.h>
 
 static u8 x = 0, y = 0;
 void printf(const char *str) {
@@ -68,7 +68,7 @@ void printGoBack(u32 amount) {
 	x -= amount - ((u32)(amount / 80) * 80);
 }
 
-class PrintfKeyboardEventHandler : public KeyboardEventHandler {
+class PrintfKeyboardEventHandler : public drivers::KeyboardEventHandler {
 	public:
 		void OnKeyDown(char c) {
 			printChar(c);
@@ -81,7 +81,7 @@ class PrintfKeyboardEventHandler : public KeyboardEventHandler {
 		}
 };
 
-class PrintfMouseEventHandler : public MouseEventHandler {
+class PrintfMouseEventHandler : public drivers::MouseEventHandler {
 	public:
 		void OnMouseSetup() {
 			u16* videoMemory = (u16*)0xb8000;
@@ -107,15 +107,15 @@ class PrintfMouseEventHandler : public MouseEventHandler {
 
 extern "C" void kernelMain(void *multiboot_structure, unsigned int magic_number) {
 	printf("Initalizing Hardware Stage 1: Bare Bones.\n");
-	GlobalDescriptorTable gdt;
-	InterruptManager interrupts(&gdt);
+	hardware::GlobalDescriptorTable gdt;
+	hardware::InterruptManager interrupts(&gdt);
 	printf("Initalizing Hardware Stage 2: Driver Abstractions.\n");
-	DriverManager driverManager;
+	drivers::DriverManager driverManager;
 	PrintfKeyboardEventHandler keyboardHandler;
-	KeyboardDriver keyboard(&interrupts, &keyboardHandler);
+	drivers::KeyboardDriver keyboard(&interrupts, &keyboardHandler);
 	driverManager.AddDriver(&keyboard);
 	PrintfMouseEventHandler mouseHandler;
-	MouseDriver mouse(&interrupts, &mouseHandler);
+	drivers::MouseDriver mouse(&interrupts, &mouseHandler);
 	driverManager.AddDriver(&mouse);
 	printf("Initalizing Hardware Stage 3: Activating Driver Manager.\n");
 	driverManager.ActivateAll();

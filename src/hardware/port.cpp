@@ -1,6 +1,7 @@
-#include "port.h"
-#include "types.h"
+#include <hardware/port.h>
+#include <common/types.h>
 
+using namespace hardware;
 Port::Port(u16 portNumber) {
 	this->portNumber = portNumber;
 }

@@ -1,6 +1,7 @@
-#include "interrupts.h"
-#include "types.h"
+#include <hardware/interrupts.h>
+#include <common/types.h>
 
+using namespace hardware;
 void printf(const char *);
 void printfHex(u8);
 
