@@ -129,8 +129,9 @@ u32 KeyboardDriver::HandleInterrupt(u32 esp) {
 			
 			// The keycodes you get are absolutely awful.
 			default:
-				printf("Unhandled Keycode ");
+				printf("UNHANDLED KEYCODE: ");
 				printfHex(dataReadKey);
+				printf(".\n");
 				break;
 		}
 

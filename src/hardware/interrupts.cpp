@@ -102,8 +102,9 @@ u32 InterruptManager::DoHandleInterrupt(u8 interruptNumber, u32 esp) {
 	if(handlers[interruptNumber] != 0) {
 		esp = handlers[interruptNumber]->HandleInterrupt(esp);
 	} else if (interruptNumber != 0x20) {
-		printf("Unhandled Interrupt ");
+		printf("UNHANDLED INTERRUPT: ");
 		printfHex(interruptNumber);
+		printf(".\n");
 	}
 	
 	if(0x20 <= interruptNumber && interruptNumber < 0x30) {

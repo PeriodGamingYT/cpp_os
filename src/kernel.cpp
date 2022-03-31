@@ -2,6 +2,7 @@
 #include <hardware/gdt.h>
 #include <drivers/driver.h>
 #include <hardware/interrupts.h>
+#include <hardware/pci.h>
 #include <drivers/keyboard.h>
 #include <drivers/mouse.h>
 
@@ -30,7 +31,7 @@ void printf(const char *str) {
 
 		if(y >= 24) {
 			for(y = 0; y < 24; y++) {
-				for(x = 0; x < 24; x++) {
+				for(x = 0; x < 80; x++) {
 					videoMemory[80*y+x] = (videoMemory[80*y+x] & 0xFF00) | ' ';
 				}	
 			}
@@ -41,20 +42,20 @@ void printf(const char *str) {
 }
 
 void printfHex(u8 number) {
-	char *message = "0x00.\n";
+	char *message = "0x00";
 	const char *hex = "0123456789ABCDEF";
 	message[2] = hex[(number >> 4) & 0xF];
 	message[3] = hex[number & 0xF];
 	printf(message);
 }
 
-void printChar(char c) {
+void printfChar(char c) {
 	char *s = " ";
 	s[0] = c;
 	printf(s);
 }
 
-void printGoBack(u32 amount) {
+void printfGoBack(u32 amount) {
 	if(amount > 80 * 24) {
 		return; // Can't overflow back to normal.
 	}
@@ -71,13 +72,13 @@ void printGoBack(u32 amount) {
 class PrintfKeyboardEventHandler : public drivers::KeyboardEventHandler {
 	public:
 		void OnKeyDown(char c) {
-			printChar(c);
+			printfChar(c);
 		}
 
 		void OnDelete() {
-			printGoBack(1);
-			printChar(' ');
-			printGoBack(1);
+			printfGoBack(1);
+			printfChar(' ');
+			printfGoBack(1);
 		}
 };
 
@@ -117,7 +118,9 @@ extern "C" void kernelMain(void *multiboot_structure, unsigned int magic_number)
 	PrintfMouseEventHandler mouseHandler;
 	drivers::MouseDriver mouse(&interrupts, &mouseHandler);
 	driverManager.AddDriver(&mouse);
-	printf("Initalizing Hardware Stage 3: Activating Driver Manager.\n");
+	printf("Initalizing Hardware Stage 3: Activating Driver Manager & PCI.\n");
+	hardware::PeripheralComponentInterconnectController pciController;
+	pciController.SelectDrivers(&driverManager);
 	driverManager.ActivateAll();
 	interrupts.Activate();
 	while(1);
