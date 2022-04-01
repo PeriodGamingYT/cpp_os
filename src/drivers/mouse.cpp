@@ -2,7 +2,7 @@
 
 using namespace drivers;
 MouseEventHandler::MouseEventHandler() {}
-void MouseEventHandler::OnMouseMove(i8 oldX, i8 oldY, i8 x, i8 y) {}
+void MouseEventHandler::OnMouseMove(i8 x, i8 y) {}
 void MouseEventHandler::OnMouseButtonDown(u8 button) {}
 void MouseEventHandler::OnMouseButtonUp(u8 button) {}
 void MouseEventHandler::OnMouseSetup() {}
@@ -45,19 +45,17 @@ u32 MouseDriver::HandleInterrupt(u32 esp) {
 	buffer[offset] = dataPort.Read();
 	offset = (offset + 1) % 3;
 	if(offset == 0) {
-		i8 oldX = x, oldY = y;
-		x += buffer[1];
-		x = x < 0 ? 0 : x;
-		x = x >= 80 ? 79 : x;
-		y -= buffer[2];
-		y = y < 0 ? 0 : y;
-		y = y >= 24 ? 23 : y;
-		handler->OnMouseMove(oldX, oldY, x, y);
+		if(buffer[1] != 0 || buffer[2] != 0) {
+				handler->OnMouseMove((i8)buffer[1], -((i8)buffer[2]));
+		}
+
 		for(u8 i = 0; i < 3; i++) {
-			if((buffer[0] & (0x01 << i)) != (buttons & (0x01 << i))) {
-				handler->OnMouseButtonDown(i);
-			} else {
-				handler->OnMouseButtonUp(i);
+			if((buffer[0] & (0x1 << i)) != (buttons & (0x1 << i))) {
+				if(buttons & (0x1 << i)) {
+					handler->OnMouseButtonUp(i + 1);
+				} else {
+					handler->OnMouseButtonDown(i + 1);
+				}
 			}
 		}
 

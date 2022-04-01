@@ -28,8 +28,9 @@ namespace drivers {
       ~VideoGraphicsArray();
       virtual bool SupportsMode(u32 width, u32 height, u32 colorDepth);
       virtual bool SetMode(u32 width, u32 height, u32 colorDepth);
-      virtual void PutPixel(u32 x, u32 y, u32 r, u32 g, u32 b);
-      virtual void PutPixel(u32 x, u32 y, u8 colorCode);
+      virtual void PutPixel(i32 x, i32 y, u8 r, u8 g, u8 b);
+      virtual void PutPixel(i32 x, i32 y, u8 colorCode);
+      virtual void FillRectangle(i32 x, i32 y, i32 width, i32 height, u8 r, u8 g, u8 b);
   };
 }
 

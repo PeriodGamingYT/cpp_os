@@ -50,16 +50,21 @@ u8 *VideoGraphicsArray::GetFrameBufferSegment() {
   }
 }
 
-void VideoGraphicsArray::PutPixel(u32 x, u32 y, u8 colorCode) {
+void VideoGraphicsArray::PutPixel(i32 x, i32 y, u8 colorCode) {
+  if(x < 0 || y < 0 || x > 320 || y > 200) {
+    return;
+  }
+
   u8 *pixelAddress = GetFrameBufferSegment() + ((320 * y) + x);
   *pixelAddress = colorCode;
 }
 
 u8 VideoGraphicsArray::GetColorIndex(u32 r, u32 g, u32 b) {
-  if(r == 0x00 && g == 0x00 && b == 0xA8) {
-    return 0x01;
-  }
-
+  if(r == 0x00 && g == 0x00 && b == 0x00) return 0x00; // black
+  if(r == 0x00 && g == 0x00 && b == 0xA8) return 0x01; // blue
+  if(r == 0x00 && g == 0xA8 && b == 0x00) return 0x02; // green
+  if(r == 0xA8 && g == 0x00 && b == 0x00) return 0x04; // red
+  if(r == 0xFF && g == 0xFF && b == 0xFF) return 0x3F; // white
   return 0x00;
 }
 
@@ -74,13 +79,8 @@ VideoGraphicsArray::VideoGraphicsArray()
     attributeControllerIndexPort(0x3c0),
     attributeControllerReadPort(0x3c1),
     attributeControllerWritePort(0x3c0),
-    attributeControllerResetPort(0x3da) {
-
-}
-
-VideoGraphicsArray::~VideoGraphicsArray() {
-
-}
+    attributeControllerResetPort(0x3da) {}
+VideoGraphicsArray::~VideoGraphicsArray() {}
 
 bool VideoGraphicsArray::SupportsMode(u32 width, u32 height, u32 colorDepth) {
   return width == 320 && height == 200 && colorDepth == 8;
@@ -114,6 +114,14 @@ bool VideoGraphicsArray::SetMode(u32 width, u32 height, u32 colorDepth) {
   return true;
 }
 
-void VideoGraphicsArray::PutPixel(u32 x, u32 y, u32 r, u32 g, u32 b) {
+void VideoGraphicsArray::PutPixel(i32 x, i32 y, u8 r, u8 g, u8 b) {
   PutPixel(x, y, GetColorIndex(r, g, b));
+}
+
+void VideoGraphicsArray::FillRectangle(i32 x, i32 y, i32 width, i32 height, u8 r, u8 g, u8 b) {
+  for(i32 Y = 0; Y < height; Y++) {
+    for(i32 X = 0; X < width; X++) {
+      PutPixel(X+x, Y+y, r, g, b);
+    }
+  }
 }

@@ -10,7 +10,7 @@ namespace drivers {
 	class MouseEventHandler {
 		public:
 			MouseEventHandler();
-			virtual void OnMouseMove(i8 oldX, i8 oldY, i8 x, i8 y);
+			virtual void OnMouseMove(i8 x, i8 y);
 			virtual void OnMouseButtonDown(u8 button);
 			virtual void OnMouseButtonUp(u8 button);
 			virtual void OnMouseSetup();
@@ -25,8 +25,6 @@ namespace drivers {
 			u8 offset;
 			u8 buttons;
 		public:
-			i8 x;
-			i8 y;
 			MouseDriver(hardware::InterruptManager *, MouseEventHandler *);
 			~MouseDriver();
 			virtual u32 HandleInterrupt(u32 esp);

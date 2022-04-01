@@ -6,6 +6,10 @@
 #include <drivers/keyboard.h>
 #include <drivers/mouse.h>
 #include <drivers/vga.h>
+#include <gui/widget.h>
+#include <gui/window.h>
+#include <gui/desktop.h>
+#define GRAPHICS_MODE
 
 static u8 x = 0, y = 0;
 void printf(const char *str) {
@@ -84,6 +88,8 @@ class PrintfKeyboardEventHandler : public drivers::KeyboardEventHandler {
 };
 
 class PrintfMouseEventHandler : public drivers::MouseEventHandler {
+	protected:
+		i8 oldX, oldY, x, y;
 	public:
 		void OnMouseSetup() {
 			u16* videoMemory = (u16*)0xb8000;
@@ -93,13 +99,15 @@ class PrintfMouseEventHandler : public drivers::MouseEventHandler {
 				| (videoMemory[0] & 0x00FF);
 		}
 		
-		void OnMouseMove(i8 oldX, i8 oldY, i8 x, i8 y) {
+		void OnMouseMove(i8 x, i8 y) {
 			u16* videoMemory = (u16*)0xb8000;
 			videoMemory[80*oldY+oldX] = 
 				(videoMemory[80*oldY+oldX] & 0x0F00) << 4
 				| (videoMemory[80*oldY+oldX] & 0xF000) >> 4
 				| (videoMemory[80*oldY+oldX] & 0x00FF);
 
+			this->x += x;
+			this->y += y;
 			videoMemory[80*y+x] = 
 				(videoMemory[80*y+x] & 0x0F00) << 4
 				| (videoMemory[80*y+x] & 0xF000) >> 4
@@ -112,25 +120,44 @@ extern "C" void kernelMain(void *multiboot_structure, unsigned int magic_number)
 	hardware::GlobalDescriptorTable gdt;
 	hardware::InterruptManager interrupts(&gdt);
 	printf("Initalizing Hardware Stage 2: Driver Abstractions.\n");
+	gui::Desktop desktop(320, 200, 0x00, 0x00, 0xA8);
 	drivers::DriverManager driverManager;
-	PrintfKeyboardEventHandler keyboardHandler;
-	drivers::KeyboardDriver keyboard(&interrupts, &keyboardHandler);
+	#ifdef GRAPHICS_MODE
+		drivers::KeyboardDriver keyboard(&interrupts, &desktop);
+	#else
+		PrintfKeyboardEventHandler keyboardHandler;
+		drivers::KeyboardDriver keyboard(&interrupts, &keyboardHandler);
+	#endif
+
 	driverManager.AddDriver(&keyboard);
-	PrintfMouseEventHandler mouseHandler;
-	drivers::MouseDriver mouse(&interrupts, &mouseHandler);
+	#ifdef GRAPHICS_MODE
+		drivers::MouseDriver mouse(&interrupts, &desktop);
+	#else
+		PrintfMouseEventHandler mouseHandler;
+		drivers::MouseDriver mouse(&interrupts, &mouseHandler);
+	#endif
+
 	driverManager.AddDriver(&mouse);
-	drivers::VideoGraphicsArray vga;
+	#ifdef GRAPHICS_MODE
+		drivers::VideoGraphicsArray vga;
+	#endif
+
 	printf("Initalizing Hardware Stage 3: Activating Driver Manager & PCI.\n");
 	hardware::PeripheralComponentInterconnectController pciController;
 	pciController.SelectDrivers(&driverManager, &interrupts);
 	driverManager.ActivateAll();
 	interrupts.Activate();
-	vga.SetMode(320, 200, 8);
-	for(i32 y = 0; y < 200; y++) {
-		for(i32 x = 0; x < 320; x++) {
-			vga.PutPixel(x, y, 0x00, 0x00, 0xA8);
-		}
-	}
+	#ifdef GRAPHICS_MODE
+		vga.SetMode(320, 200, 8);
+		gui::Window window1(&desktop, 10, 10, 20, 20, 0xA8, 0x00, 0x00);
+		desktop.AddChild(&window1);
+		gui::Window window2(&desktop, 40, 15, 30, 30, 0x00, 0xA8, 0x00);
+		desktop.AddChild(&window2);
+	#endif
 
-	while(1);
+	while(1) {
+		#ifdef GRAPHICS_MODE
+			desktop.Draw(&vga);
+		#endif
+	}
 }
