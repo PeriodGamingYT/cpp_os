@@ -12,6 +12,7 @@ objects = \
 	obj/hardware/pci.o \
 	obj/drivers/keyboard.o \
 	obj/drivers/mouse.o \
+	obj/drivers/vga.o \
 	obj/kernel.o
 
 obj/%.o: src/%.cpp
@@ -49,5 +50,5 @@ run: mykernel.iso
 
 .PHONY: clean
 clean:
-	rm -rf objs mykernel.bin mykernel.iso
-	mkdir objs
+	rm -rf obj mykernel.bin mykernel.iso
+	mkdir obj

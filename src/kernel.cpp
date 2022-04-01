@@ -5,6 +5,7 @@
 #include <hardware/pci.h>
 #include <drivers/keyboard.h>
 #include <drivers/mouse.h>
+#include <drivers/vga.h>
 
 static u8 x = 0, y = 0;
 void printf(const char *str) {
@@ -118,10 +119,18 @@ extern "C" void kernelMain(void *multiboot_structure, unsigned int magic_number)
 	PrintfMouseEventHandler mouseHandler;
 	drivers::MouseDriver mouse(&interrupts, &mouseHandler);
 	driverManager.AddDriver(&mouse);
+	drivers::VideoGraphicsArray vga;
 	printf("Initalizing Hardware Stage 3: Activating Driver Manager & PCI.\n");
 	hardware::PeripheralComponentInterconnectController pciController;
 	pciController.SelectDrivers(&driverManager, &interrupts);
 	driverManager.ActivateAll();
 	interrupts.Activate();
+	vga.SetMode(320, 200, 8);
+	for(int y = 0; y < 200; y++) {
+		for(int x = 0; x < 320; x++) {
+			vga.PutPixel(x, y, 0x01);
+		}
+	}
+
 	while(1);
 }
