@@ -7,6 +7,19 @@
 #include <drivers/driver.h>
 
 namespace hardware {
+  enum BaseAddressRegisterType {
+    MemoryMapping = 0, 
+    InputOutput = 1
+  };
+
+  class BaseAddressRegister {
+    public:
+      bool prefetchable;
+      u8 *address;
+      u32 size;
+      BaseAddressRegisterType type;
+  };
+
   class PeripheralComponentInterconnectDeviceDescription {
     public:
       u32 portBase;
@@ -35,8 +48,10 @@ namespace hardware {
       u32 Read(u16 bus, u16 device, u16 function, u32 registerOffset);
       void Write(u16 bus, u16 device, u16 function, u32 registerOffset, u32 value);
       bool DeviceHasFunctions(u16 bus, u16 device);
-      void SelectDrivers(drivers::DriverManager *driverManager);
+      drivers::Driver *GetDriver(PeripheralComponentInterconnectDeviceDescription device, InterruptManager *interrupts);
+      void SelectDrivers(drivers::DriverManager *manager, InterruptManager *interrupts);
       PeripheralComponentInterconnectDeviceDescription GetDeviceDescriptor(u16 bus, u16 device, u16 function);
+      BaseAddressRegister GetBaseAddressRegister(u16 bus, u16 device, u16 function, u16 bar);
   };
 }
 

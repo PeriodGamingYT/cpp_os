@@ -120,7 +120,7 @@ extern "C" void kernelMain(void *multiboot_structure, unsigned int magic_number)
 	driverManager.AddDriver(&mouse);
 	printf("Initalizing Hardware Stage 3: Activating Driver Manager & PCI.\n");
 	hardware::PeripheralComponentInterconnectController pciController;
-	pciController.SelectDrivers(&driverManager);
+	pciController.SelectDrivers(&driverManager, &interrupts);
 	driverManager.ActivateAll();
 	interrupts.Activate();
 	while(1);

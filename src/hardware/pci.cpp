@@ -48,7 +48,9 @@ bool PeripheralComponentInterconnectController::DeviceHasFunctions(u16 bus, u16 
   return Read(bus, device, 0, 0x0E) & (1 << 7);
 }
 
-void PeripheralComponentInterconnectController::SelectDrivers(drivers::DriverManager *driverManager) {
+void PeripheralComponentInterconnectController::SelectDrivers(
+  drivers::DriverManager *driverManager, 
+  InterruptManager *interrupts) {
   for(u16 bus = 0; bus < 8; bus++) {
     for(u16 device = 0; device < 32; device++) {
       u16 numFunctions = DeviceHasFunctions(bus, device) ? 8 : 1;
@@ -57,6 +59,18 @@ void PeripheralComponentInterconnectController::SelectDrivers(drivers::DriverMan
         if(deviceDescriptor.vendorId == 0x0000 ||
            deviceDescriptor.vendorId == 0xFFFF) {
           continue;
+        }
+
+        for(int barNum = 0; barNum < 6; barNum++) {
+          BaseAddressRegister bar = GetBaseAddressRegister(bus, device, function, barNum);
+          if(bar.address && bar.type == BaseAddressRegisterType::InputOutput) {
+            deviceDescriptor.portBase = (u32)bar.address;
+          }
+
+          drivers::Driver *driver = GetDriver(deviceDescriptor, interrupts);
+          if(driver != 0) {
+            driverManager->AddDriver(driver);
+          }
         }
 
         printf("PCI BUS: ");
@@ -73,6 +87,73 @@ void PeripheralComponentInterconnectController::SelectDrivers(drivers::DriverMan
       }
     }
   }
+}
+
+BaseAddressRegister PeripheralComponentInterconnectController::GetBaseAddressRegister(
+  u16 bus, 
+  u16 device,
+  u16 function,
+  u16 bar) {
+  BaseAddressRegister result;
+  u32 headerType = Read(bus, device, function, 0x0E) & 0x7F;
+  int maxBars = 6 - (4 * headerType);
+  if(bar > maxBars) {
+    return result;
+  }
+
+  u32 barValue = Read(bus, device, function, 0x10 + 4 * bar);
+  result.type = (barValue & 0x1) ? InputOutput : MemoryMapping;
+
+  u32 temp;
+  if(result.type == MemoryMapping) {
+    switch((barValue >> 1) & 0x3) {
+      case 0: // 32 Bit Mode.
+      case 1: // 20 Bit Mode.
+      case 2: break; // 64 Bit Mode.
+    }
+
+    result.prefetchable = ((barValue >> 3) & 0x1) == 0x1;
+  } else {
+    result.address = (u8*)(barValue & ~0x3);
+    result.prefetchable = false;
+  }
+
+  return result;
+}
+
+drivers::Driver *PeripheralComponentInterconnectController::GetDriver(
+  PeripheralComponentInterconnectDeviceDescription device, 
+  InterruptManager *interrupts) {
+  switch(device.vendorId) {
+    case 0x1022: // AMD.
+      printf("AMD ");
+      switch(device.deviceId) {
+        case 0x2000: // am79c973.
+          printf("AM79C973");
+          break;
+      }
+      
+      printf(" ");
+      break;
+    
+    case 0x8086: // Intel.
+      printf("INTEL ");
+      break;
+  }
+
+  switch(device.classId) {
+    case 0x03: // Graphics.
+      printf("GRAPHICS ");
+      switch(device.subclassId) {
+        case 0x00: // VGA.
+          printf("VGA");
+          break;
+      }
+      
+      printf(" ");
+  }
+
+  return 0;
 }
 
 PeripheralComponentInterconnectDeviceDescription 
