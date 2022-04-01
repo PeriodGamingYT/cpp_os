@@ -14,8 +14,8 @@ void VideoGraphicsArray::WriteRegisters(u8* registers) {
   crtcDataPort.Write(crtcDataPort.Read() | 0x80);
   crtcIndexPort.Write(0x11);
   crtcDataPort.Write(crtcDataPort.Read() & ~0x80);
-  registers[0x03] = registers[0x03] | 0x80;
-  registers[0x11] = registers[0x11] & ~0x80;
+  registers[0x03] |= 0x80;
+  registers[0x11] &= ~0x80;
   for(u8 i = 0; i < 25; i++) {
     crtcIndexPort.Write(i);
     crtcDataPort.Write(*(registers++));
