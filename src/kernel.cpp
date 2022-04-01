@@ -126,9 +126,9 @@ extern "C" void kernelMain(void *multiboot_structure, unsigned int magic_number)
 	driverManager.ActivateAll();
 	interrupts.Activate();
 	vga.SetMode(320, 200, 8);
-	for(int y = 0; y < 200; y++) {
-		for(int x = 0; x < 320; x++) {
-			vga.PutPixel(x, y, 0x01);
+	for(i32 y = 0; y < 200; y++) {
+		for(i32 x = 0; x < 320; x++) {
+			vga.PutPixel(x, y, 0x00, 0x00, 0xA8);
 		}
 	}
 

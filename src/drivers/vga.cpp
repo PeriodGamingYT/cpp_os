@@ -14,14 +14,19 @@ void VideoGraphicsArray::WriteRegisters(u8* registers) {
   crtcDataPort.Write(crtcDataPort.Read() | 0x80);
   crtcIndexPort.Write(0x11);
   crtcDataPort.Write(crtcDataPort.Read() & ~0x80);
-  registers[0x03] |= 0x80;
-  registers[0x11] &= ~0x80;
-  for(int i = 0; i < 25; i++) {
+  registers[0x03] = registers[0x03] | 0x80;
+  registers[0x11] = registers[0x11] & ~0x80;
+  for(u8 i = 0; i < 25; i++) {
     crtcIndexPort.Write(i);
     crtcDataPort.Write(*(registers++));
   }
 
-  for(int i = 0; i < 21; i++) {
+  for(u8 i = 0; i < 9; i++) {
+    graphicsControllerIndexPort.Write(i);
+    graphicsControllerDataPort.Write(*(registers++));
+  }
+
+  for(u8 i = 0; i < 21; i++) {
     attributeControllerResetPort.Read();
     attributeControllerIndexPort.Write(i);
     attributeControllerWritePort.Write(*(registers++));
@@ -31,15 +36,17 @@ void VideoGraphicsArray::WriteRegisters(u8* registers) {
   attributeControllerIndexPort.Write(0x20);
 }
 
+void printfHex(u8);
 u8 *VideoGraphicsArray::GetFrameBufferSegment() {
   graphicsControllerIndexPort.Write(0x06);
-  u8 segmentNum = graphicsControllerDataPort.Read() & (3 << 2);
+  u8 segmentNum = (graphicsControllerDataPort.Read() >> 2) & 0x03;
+  printfHex(segmentNum);
   switch(segmentNum) {
     default:
-    case 0 << 2: return (u8*)0x00000;
-    case 1 << 2: return (u8*)0xA0000;
-    case 2 << 2: return (u8*)0xB0000;
-    case 3 << 2: return (u8*)0xB8000;
+    case 0: return (u8*)0x00000; // 0x00000.
+    case 1: return (u8*)0xA0000; // 0xA0000.
+    case 2: return (u8*)0xB0000; // 0xB0000.
+    case 3: return (u8*)0xB8000; // 0xB8000.
   }
 }
 
