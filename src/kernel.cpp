@@ -89,7 +89,7 @@ class PrintfKeyboardEventHandler : public drivers::KeyboardEventHandler {
 
 class PrintfMouseEventHandler : public drivers::MouseEventHandler {
 	protected:
-		i8 oldX, oldY, x, y;
+		i8 x, y;
 	public:
 		void OnMouseSetup() {
 			u16* videoMemory = (u16*)0xb8000;
@@ -101,17 +101,17 @@ class PrintfMouseEventHandler : public drivers::MouseEventHandler {
 		
 		void OnMouseMove(i8 x, i8 y) {
 			u16* videoMemory = (u16*)0xb8000;
-			videoMemory[80*oldY+oldX] = 
-				(videoMemory[80*oldY+oldX] & 0x0F00) << 4
-				| (videoMemory[80*oldY+oldX] & 0xF000) >> 4
-				| (videoMemory[80*oldY+oldX] & 0x00FF);
+			videoMemory[80*this->y + this->x] = 
+				(videoMemory[80 * this->y + this->x] & 0x0F00) << 4
+				| (videoMemory[80 * this->y +this->x] & 0xF000) >> 4
+				| (videoMemory[80 * this->y + this->x] & 0x00FF);
 
 			this->x += x;
 			this->y += y;
-			videoMemory[80*y+x] = 
-				(videoMemory[80*y+x] & 0x0F00) << 4
-				| (videoMemory[80*y+x] & 0xF000) >> 4
-				| (videoMemory[80*y+x] & 0x00FF);
+			videoMemory[80*this->y + this->x] = 
+				(videoMemory[80 * this->y + this->x] & 0x0F00) << 4
+				| (videoMemory[80 * this->y +this->x] & 0xF000) >> 4
+				| (videoMemory[80 * this->y + this->x] & 0x00FF);
 		}
 };
 

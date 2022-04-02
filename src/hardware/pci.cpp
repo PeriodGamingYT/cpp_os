@@ -124,12 +124,11 @@ BaseAddressRegister PeripheralComponentInterconnectController::GetBaseAddressReg
 drivers::Driver *PeripheralComponentInterconnectController::GetDriver(
   PeripheralComponentInterconnectDeviceDescription device, 
   InterruptManager *interrupts) {
+  // Doing something with this later.
   switch(device.vendorId) {
     case 0x1022: // AMD.
-      printf("AMD ");
       switch(device.deviceId) {
         case 0x2000: // am79c973.
-          printf("AM79C973");
           break;
       }
       
@@ -137,20 +136,16 @@ drivers::Driver *PeripheralComponentInterconnectController::GetDriver(
       break;
     
     case 0x8086: // Intel.
-      printf("INTEL ");
       break;
   }
 
   switch(device.classId) {
     case 0x03: // Graphics.
-      printf("GRAPHICS ");
       switch(device.subclassId) {
         case 0x00: // VGA.
-          printf("VGA");
           break;
       }
       
-      printf(" ");
   }
 
   return 0;
