@@ -7,14 +7,17 @@
 #include <drivers/driver.h>
 
 namespace drivers {
+	enum keys {
+		ESCAPE = 27, 
+		DELETE = 127
+	};
+
 	class KeyboardEventHandler {
 		public:
 			KeyboardEventHandler();
 			virtual void OnKeyDown(char);
 			virtual void OnKeyUp(char);
-			virtual void OnDelete();
 			virtual void OnCapsLock(bool);
-			virtual void OnEscape();
 			virtual void OnAlt();
 			virtual void OnControl();
 			virtual void OnShift();
@@ -32,9 +35,6 @@ namespace drivers {
 			bool alt;
 			bool shift;
 			bool capsLock;
-			bool capsLockDown;
-			bool backspaceDown;
-			bool escapeDown;
 			char key;
 			bool IsPrintable();
 			KeyboardDriver(hardware::InterruptManager *manager, KeyboardEventHandler *handler);

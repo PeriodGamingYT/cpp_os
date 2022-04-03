@@ -14,8 +14,7 @@ objects = \
 	obj/drivers/mouse.o \
 	obj/drivers/vga.o \
 	obj/gui/widget.o \
-	obj/gui/window.o \
-	obj/gui/desktop.o \
+	obj/gui/rectangle.o \
 	obj/kernel.o
 
 obj/%.o: src/%.cpp

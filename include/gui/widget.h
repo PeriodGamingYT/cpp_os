@@ -3,68 +3,87 @@
 
 #include <common/types.h>
 #include <common/graphics.h>
-#include <drivers/keyboard.h>
 #include <drivers/mouse.h>
+#include <drivers/keyboard.h>
 
 namespace gui {
-  class Widget : public drivers::KeyboardEventHandler {
-    protected:
-      Widget *parent;
-      i32 x;
-      i32 y;
-      i32 width;
-      i32 height;
-      u8 r;
-      u8 g;
-      u8 b;
-      bool focusable;
-
+  class WidgetCollection;
+  class Widget {
     public:
-      Widget(Widget *parent, i32 x, i32 y, i32 width, i32 height, u8 r, u8 g, u8 b);
+      Widget(WidgetCollection *parent, i32 x, i32 y, i8 w, i8 h, u8 r, u8 g, u8 b);
       ~Widget();
-      bool ContainsCoordinate(i32 x, i32 y);
-      virtual void GetFocus(Widget *widget);
-      virtual void ModelToScreen(i32 &x, i32 &y);
-      virtual void Draw(GraphicsContext *graphicsContext);
+      i8 x, y, w, h;
+      u8 r, g, b;
+      GraphicsContext *context;
+      virtual void OnSetup();
+      virtual void OnMouseMove(i32 oldX, i32 oldY, i32 x, i32 y);
       virtual void OnMouseDown(i32 x, i32 y, u8 button);
       virtual void OnMouseUp(i32 x, i32 y, u8 button);
-      virtual void OnMouseMove(i8 oldX, i8 oldY, i8 x, i8 y);
       virtual void OnKeyDown(char key);
 			virtual void OnKeyUp(char key);
-			virtual void OnDelete();
 			virtual void OnCapsLock(bool capsLock);
-			virtual void OnEscape();
 			virtual void OnAlt();
 			virtual void OnControl();
 			virtual void OnShift();
 			virtual void OnMeta();
   };
 
-  class CompositeWidget : public Widget {
+  class MasterWidget;
+  class WidgetCollection {
     protected:
-      Widget *children[256];
-      int numChildren;
-      Widget *focusedChild;
-
+      Widget *widgets[256];
+      int numWidgets;
+      int focusedWidget;
     public:
-      CompositeWidget(Widget *parent, i32 x, i32 y, i32 width, i32 height, u8 r, u8 g, u8 b);
-      ~CompositeWidget();
-      virtual void GetFocus(Widget *widget);
-      virtual void ModelToScreen(i32 &x, i32 &y);
-      virtual void Draw(GraphicsContext *graphicsContext);
-      virtual bool AddChild(Widget *child);
-      virtual void OnMouseDown(i32 x, i32 y, u8 button);
-      virtual void OnMouseUp(i32 x, i32 y, u8 button);
-      virtual void OnMouseMove(i8 oldX, i8 oldY, i8 x, i8 y);
-      virtual void OnKeyDown(char key);
-			virtual void OnKeyUp(char key);
-			virtual void OnDelete();
-			virtual void OnCapsLock(bool capsLock);
-			virtual void OnEscape();
-			virtual void OnAlt();
-			virtual void OnControl();
-			virtual void OnShift();
-			virtual void OnMeta();
+      WidgetCollection(MasterWidget *parent);
+      ~WidgetCollection();
+      GraphicsContext *context;
+      void AddWidget(Widget *widget);
+      void SetupWidgets();
+      int GetWidgetFromMouse(i32 x, i32 y);
+      void OnMouseMove(i32 oldX, i32 oldY, i32 x, i32 y, u8 r, u8 g, u8 b);
+      void OnMouseDown(i32 x, i32 y, u8 button);
+      void OnMouseUp(i32 x, i32 y, u8 button);
+      void OnKeyDown(char key);
+      void OnKeyUp(char key);
+      void OnCapsLock(bool capsLock);
+      void OnAlt();
+      void OnControl();
+      void OnShift();
+      void OnMeta();
+  };
+
+  class MasterWidget : 
+    public drivers::MouseEventHandler, 
+    public drivers::KeyboardEventHandler {
+    protected:
+      WidgetCollection *widgetCollections[16];
+      int numWidgetCollections;
+      int focusedWidgetCollection;
+      i32 mouseX;
+      i32 mouseY;
+    
+    public:
+      u8 backgroundR;
+      u8 backgroundG;
+      u8 backgroundB;
+      MasterWidget(GraphicsContext *context, u8 r, u8 g, u8 b);
+      ~MasterWidget();
+      GraphicsContext *context;
+
+      void Background();
+      void OnMouseMove(i8 x, i8 y);
+      void OnMouseButtonDown(u8 button);
+      void OnMouseButtonUp(u8 button);
+      void OnKeyDown(char key);
+      void OnKeyUp(char key);
+      void OnCapsLock(bool capsLock);
+      void OnAlt();
+      void OnControl();
+      void OnShift();
+      void OnMeta();
+      void AddWidgetCollection(WidgetCollection *collection);
+      void ChangeFocusedWidgetCollection(int newFocusedWidgetCollection);
   };
 }
 

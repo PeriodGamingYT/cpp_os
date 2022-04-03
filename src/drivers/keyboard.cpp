@@ -4,9 +4,7 @@ using namespace drivers;
 KeyboardEventHandler::KeyboardEventHandler() {}
 void KeyboardEventHandler::OnKeyUp(char key) {}
 void KeyboardEventHandler::OnKeyDown(char key) {}
-void KeyboardEventHandler::OnDelete() {}
 void KeyboardEventHandler::OnCapsLock(bool capsLock) {}
-void KeyboardEventHandler::OnEscape() {}
 void KeyboardEventHandler::OnAlt() {}
 void KeyboardEventHandler::OnControl() {}
 void KeyboardEventHandler::OnShift() {}
@@ -25,11 +23,8 @@ void KeyboardDriver::Activate() {
 	meta = false;
 	shift = false;
 	capsLock = false;
-	capsLockDown = false;
-	backspaceDown = false;
 	alt = false;
 	control = false;
-	escapeDown = false;
 	key = '\0';
 	while(commandPort.Read() & 0x1) {
 		dataPort.Read();
@@ -49,7 +44,7 @@ void printGoBack(u32);
 void printfHex(u8);
 
 bool KeyboardDriver::IsPrintable() {
-	return !control && !alt && !meta && !shift && !capsLockDown && !backspaceDown && !escapeDown;
+	return !control && !alt && !meta && !shift && key >= ' ' && key <= 126;
 }
 
 char uppercaseChar(char key) {
@@ -122,9 +117,9 @@ u32 KeyboardDriver::HandleInterrupt(u32 esp) {
 			case 0x1D: control = true; handler->OnControl(); break; // Control.
 			case 0x5B: case 0x5C: meta = false; handler->OnMeta(); break;// Meta.
 			case 0x38: alt = true; handler->OnAlt(); break; // Alt.
-			case 0x3A: capsLock = !capsLock; capsLockDown = true; handler->OnCapsLock(capsLock); break; // Caps Lock.
-			case 0x0E: backspaceDown = true; handler->OnDelete(); break; // Backspace.
-			case 0x01: escapeDown = true; handler->OnEscape(); break; // Escape.
+			case 0x3A: capsLock = !capsLock; handler->OnCapsLock(capsLock); break; // Caps Lock.
+			case 0x0E: key = 127; break; // Backspace.
+			case 0x01: key = 27; break; // Escape.
 			case 0xFA: break; // Key hold thing.
 			
 			// The keycodes you get are absolutely awful.
@@ -144,9 +139,6 @@ u32 KeyboardDriver::HandleInterrupt(u32 esp) {
 		shift = false;
 		alt = false;
 		meta = false;
-		capsLockDown = false;
-		backspaceDown = false;
-		escapeDown = false;
 	}
 	
 	return esp;

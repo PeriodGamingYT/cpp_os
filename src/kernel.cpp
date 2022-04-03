@@ -7,8 +7,7 @@
 #include <drivers/mouse.h>
 #include <drivers/vga.h>
 #include <gui/widget.h>
-#include <gui/window.h>
-#include <gui/desktop.h>
+#include <gui/rectangle.h>
 #define GRAPHICS_MODE
 
 static u8 x = 0, y = 0;
@@ -74,18 +73,24 @@ void printfGoBack(u32 amount) {
 	x -= amount - ((u32)(amount / 80) * 80);
 }
 
+#ifndef GRAPHICS_MODE
+
 class PrintfKeyboardEventHandler : public drivers::KeyboardEventHandler {
 	public:
 		void OnKeyDown(char c) {
-			printfChar(c);
-		}
-
-		void OnDelete() {
-			printfGoBack(1);
-			printfChar(' ');
-			printfGoBack(1);
+			if(c == (int)drivers::keys::ESCAPE) {
+				printfGoBack(1);
+				printfChar(' ');
+				printfGoBack(1);
+			} else {
+				printfChar(c);
+			}
 		}
 };
+
+#endif
+
+#ifndef GRAPHICS_MODE
 
 class PrintfMouseEventHandler : public drivers::MouseEventHandler {
 	protected:
@@ -115,12 +120,19 @@ class PrintfMouseEventHandler : public drivers::MouseEventHandler {
 		}
 };
 
+#endif
+
 extern "C" void kernelMain(void *multiboot_structure, unsigned int magic_number) {
 	printf("Initalizing Hardware Stage 1: Bare Bones.\n");
 	hardware::GlobalDescriptorTable gdt;
 	hardware::InterruptManager interrupts(&gdt);
 	printf("Initalizing Hardware Stage 2: Driver Abstractions.\n");
-	gui::Desktop desktop(320, 200, 0x00, 0x00, 0xA8);
+	#ifdef GRAPHICS_MODE
+		drivers::VideoGraphicsArray vga;
+		vga.SetMode(320, 200, 8);
+		gui::MasterWidget desktop(&vga, 0, 0, 0xA8);
+	#endif
+
 	drivers::DriverManager driverManager;
 	#ifdef GRAPHICS_MODE
 		drivers::KeyboardDriver keyboard(&interrupts, &desktop);
@@ -138,26 +150,17 @@ extern "C" void kernelMain(void *multiboot_structure, unsigned int magic_number)
 	#endif
 
 	driverManager.AddDriver(&mouse);
-	#ifdef GRAPHICS_MODE
-		drivers::VideoGraphicsArray vga;
-	#endif
-
 	printf("Initalizing Hardware Stage 3: Activating Driver Manager & PCI.\n");
 	hardware::PeripheralComponentInterconnectController pciController;
 	pciController.SelectDrivers(&driverManager, &interrupts);
 	driverManager.ActivateAll();
 	interrupts.Activate();
 	#ifdef GRAPHICS_MODE
-		vga.SetMode(320, 200, 8);
-		gui::Window window1(&desktop, 10, 10, 20, 20, 0xA8, 0x00, 0x00);
-		desktop.AddChild(&window1);
-		gui::Window window2(&desktop, 40, 15, 30, 30, 0x00, 0xA8, 0x00);
-		desktop.AddChild(&window2);
+		gui::WidgetCollection workspace(&desktop);
+		gui::Rectangle rect(&workspace, 0, 0, 50, 10, 0xA8, 0, 0);
+		desktop.ChangeFocusedWidgetCollection(0);
+		workspace.SetupWidgets();
 	#endif
 
-	while(1) {
-		#ifdef GRAPHICS_MODE
-			desktop.Draw(&vga);
-		#endif
-	}
+	while(1);
 }
