@@ -15,6 +15,7 @@ objects = \
 	obj/drivers/vga.o \
 	obj/gui/widget.o \
 	obj/gui/rectangle.o \
+	obj/gui/button.o \
 	obj/kernel.o
 
 obj/%.o: src/%.cpp

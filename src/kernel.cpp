@@ -8,6 +8,7 @@
 #include <drivers/vga.h>
 #include <gui/widget.h>
 #include <gui/rectangle.h>
+#include <gui/button.h>
 #define GRAPHICS_MODE
 
 static u8 x = 0, y = 0;
@@ -162,7 +163,7 @@ extern "C" void kernelMain(void *multiboot_structure, unsigned int magic_number)
 	interrupts.Activate();
 	#ifdef GRAPHICS_MODE
 		gui::WidgetCollection workspace(&desktop);
-		gui::Rectangle rect(&workspace, 0, 0, 50, 10, 0xA8, 0, 0);
+		gui::Button button(&workspace, 0, 0, 50, 10, 0xA8, 0, 0);
 		desktop.ChangeFocusedWidgetCollection(0);
 		workspace.SetupWidgets();
 	#endif
