@@ -52,8 +52,9 @@ void MasterWidget::OnMouseMove(i8 x, i8 y) {
   i32 newMouseY = mouseY + y;
   newMouseX = newMouseX < 0 ? 0 : newMouseX;
   newMouseY = newMouseY < 0 ? 0 : newMouseY;
-  newMouseX = newMouseX > 320 ? 320 : newMouseX;
-  newMouseY = newMouseY > 200 ? 200 : newMouseY;
+  // One less because of a minor bug.
+  newMouseX = newMouseX > 319 ? 319 : newMouseX;
+  newMouseY = newMouseY > 199 ? 199 : newMouseY;
   widgetCollections[focusedWidgetCollection]->OnMouseMove(
     mouseX, 
     mouseY, 

@@ -33,8 +33,8 @@ void printf(const char *str) {
 			x = 0;
 		}
 
-		if(y >= 24) {
-			for(y = 0; y < 24; y++) {
+		if(y >= 25) {
+			for(y = 0; y < 25; y++) {
 				for(x = 0; x < 80; x++) {
 					videoMemory[80*y+x] = (videoMemory[80*y+x] & 0xFF00) | ' ';
 				}	
@@ -113,6 +113,11 @@ class PrintfMouseEventHandler : public drivers::MouseEventHandler {
 
 			this->x += x;
 			this->y += y;
+			this->x = this->x < 0 ? 0 : this->x;
+			this->y = this->y < 0 ? 0 : this->y;
+			// One less because of a minor bug.
+			this->x = this->x > 79 ? 79 : this->x;
+			this->y = this->y > 24 ? 24 : this->y;
 			videoMemory[80*this->y + this->x] = 
 				(videoMemory[80 * this->y + this->x] & 0x0F00) << 4
 				| (videoMemory[80 * this->y +this->x] & 0xF000) >> 4
