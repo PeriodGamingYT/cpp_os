@@ -163,7 +163,8 @@ extern "C" void kernelMain(void *multiboot_structure, unsigned int magic_number)
 	interrupts.Activate();
 	#ifdef GRAPHICS_MODE
 		gui::WidgetCollection workspace(&desktop);
-		gui::Button button(&workspace, 0, 0, 50, 10, 0xA8, 0, 0);
+		gui::Rectangle rectangle(&workspace, 5, 30, 50, 10, 0, 0xA8, 0);
+		gui::Button button(&workspace, 5, 5, 50, 10, 0xA8, 0, 0);
 		desktop.ChangeFocusedWidgetCollection(0);
 		workspace.SetupWidgets();
 	#endif

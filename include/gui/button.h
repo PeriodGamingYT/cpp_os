@@ -8,12 +8,12 @@ namespace gui {
   class Button : public Widget {
     public:
       bool down;
-      Button(WidgetCollection *parent, i32 x, i32 y, i8 w, i8 h, u8 r, u8 g, u8 b);
+      Button(WidgetCollection *parent, i16 x, i16 y, i16 w, i16 h, u8 r, u8 g, u8 b);
       ~Button();
       void OnSetup();
-      void OnMouseMove(i32 oldX, i32 oldY, i32 x, i32 y);
-      void OnMouseDown(i32 x, i32 y, u8 button);
-      void OnMouseUp(i32 x, i32 y, u8 button);
+      void OnMouseMove(i16 oldX, i16 oldY, i16 x, i16 y);
+      void OnMouseDown(i16 x, i16 y, u8 button);
+      void OnMouseUp(i16 x, i16 y, u8 button);
   };
 }
 

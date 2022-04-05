@@ -10,15 +10,15 @@ namespace gui {
   class WidgetCollection;
   class Widget {
     public:
-      Widget(WidgetCollection *parent, i32 x, i32 y, i8 w, i8 h, u8 r, u8 g, u8 b);
+      Widget(WidgetCollection *parent, i16 x, i16 y, i16 w, i16 h, u8 r, u8 g, u8 b);
       ~Widget();
       i8 x, y, w, h;
       u8 r, g, b;
       GraphicsContext *context;
       virtual void OnSetup();
-      virtual void OnMouseMove(i32 oldX, i32 oldY, i32 x, i32 y);
-      virtual void OnMouseDown(i32 x, i32 y, u8 button);
-      virtual void OnMouseUp(i32 x, i32 y, u8 button);
+      virtual void OnMouseMove(i16 oldX, i16 oldY, i16 x, i16 y);
+      virtual void OnMouseDown(i16 x, i16 y, u8 button);
+      virtual void OnMouseUp(i16 x, i16 y, u8 button);
       virtual void OnKeyDown(char key);
 			virtual void OnKeyUp(char key);
 			virtual void OnCapsLock(bool capsLock);
@@ -40,10 +40,10 @@ namespace gui {
       GraphicsContext *context;
       void AddWidget(Widget *widget);
       void SetupWidgets();
-      int GetWidgetFromMouse(i32 x, i32 y);
-      void OnMouseMove(i32 oldX, i32 oldY, i32 x, i32 y, u8 r, u8 g, u8 b);
-      void OnMouseDown(i32 x, i32 y, u8 button);
-      void OnMouseUp(i32 x, i32 y, u8 button);
+      int GetWidgetFromMouse(i16 x, i16 y);
+      void OnMouseMove(i16 oldX, i16 oldY, i16 x, i16 y, u8 r, u8 g, u8 b);
+      void OnMouseDown(i16 x, i16 y, u8 button);
+      void OnMouseUp(i16 x, i16 y, u8 button);
       void OnKeyDown(char key);
       void OnKeyUp(char key);
       void OnCapsLock(bool capsLock);
@@ -60,8 +60,8 @@ namespace gui {
       WidgetCollection *widgetCollections[16];
       int numWidgetCollections;
       int focusedWidgetCollection;
-      i32 mouseX;
-      i32 mouseY;
+      i16 mouseX;
+      i16 mouseY;
     
     public:
       u8 backgroundR;

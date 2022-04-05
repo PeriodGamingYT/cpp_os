@@ -48,8 +48,8 @@ void MasterWidget::OnMouseButtonUp(u8 button) {
 
 void MasterWidget::OnMouseMove(i8 x, i8 y) {
   if(focusedWidgetCollection == -1) return;
-  i32 newMouseX = mouseX + x;
-  i32 newMouseY = mouseY + y;
+  i16 newMouseX = mouseX + x;
+  i16 newMouseY = mouseY + y;
   newMouseX = newMouseX < 0 ? 0 : newMouseX;
   newMouseY = newMouseY < 0 ? 0 : newMouseY;
   // One less because of a minor bug.
@@ -130,7 +130,7 @@ void WidgetCollection::SetupWidgets() {
   }
 }
 
-int WidgetCollection::GetWidgetFromMouse(i32 x, i32 y) {
+int WidgetCollection::GetWidgetFromMouse(i16 x, i16 y) {
   for(int i = 0; i < numWidgets; i++) {
     if(
       widgets[i]->x <= x &&
@@ -145,19 +145,19 @@ int WidgetCollection::GetWidgetFromMouse(i32 x, i32 y) {
   return -1;
 }
 
-void WidgetCollection::OnMouseMove(i32 oldX, i32 oldY, i32 x, i32 y, u8 r, u8 g, u8 b) {
+void WidgetCollection::OnMouseMove(i16 oldX, i16 oldY, i16 x, i16 y, u8 r, u8 g, u8 b) {
   int index = GetWidgetFromMouse(oldX, oldY);
   context->PutPixel(oldX, oldY, r, g, b);
   if(index != -1) widgets[index]->OnMouseMove(oldX, oldY, x, y);
   context->PutPixel(x, y, 0xFF, 0xFF, 0xFF);
 }
 
-void WidgetCollection::OnMouseDown(i32 x, i32 y, u8 button) {
+void WidgetCollection::OnMouseDown(i16 x, i16 y, u8 button) {
   int index = GetWidgetFromMouse(x, y);
   if(index != -1) widgets[index]->OnMouseDown(x, y, button);
 }
 
-void WidgetCollection::OnMouseUp(i32 x, i32 y, u8 button) {
+void WidgetCollection::OnMouseUp(i16 x, i16 y, u8 button) {
   int index = GetWidgetFromMouse(x, y);
   if(index != -1) widgets[index]->OnMouseUp(x, y, button);
 }
@@ -197,7 +197,7 @@ void WidgetCollection::OnMeta() {
   widgets[focusedWidget]->OnMeta();
 }
 
-Widget::Widget(WidgetCollection *parent, i32 x, i32 y, i8 w, i8 h, u8 r, u8 g, u8 b) {
+Widget::Widget(WidgetCollection *parent, i16 x, i16 y, i16 w, i16 h, u8 r, u8 g, u8 b) {
   if(parent != 0) {
     context = parent->context;
     this->x = x;
@@ -213,9 +213,9 @@ Widget::Widget(WidgetCollection *parent, i32 x, i32 y, i8 w, i8 h, u8 r, u8 g, u
 
 Widget::~Widget() {}
 void Widget::OnSetup() {}
-void Widget::OnMouseMove(i32 oldX, i32 oldY, i32 x, i32 y) {}
-void Widget::OnMouseDown(i32 x, i32 y, u8 button) {}
-void Widget::OnMouseUp(i32 x, i32 y, u8 button) {}
+void Widget::OnMouseMove(i16 oldX, i16 oldY, i16 x, i16 y) {}
+void Widget::OnMouseDown(i16 x, i16 y, u8 button) {}
+void Widget::OnMouseUp(i16 x, i16 y, u8 button) {}
 void Widget::OnKeyDown(char key) {}
 void Widget::OnKeyUp(char key) {}
 void Widget::OnCapsLock(bool capsLock) {}
