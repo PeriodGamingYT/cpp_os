@@ -168,7 +168,7 @@ extern "C" void kernelMain(void *multiboot_structure, unsigned int magic_number)
 		gui::Button button(&workspace, 5, 5, 50, 10, 0xA8, 0, 0);
 		desktop.ChangeFocusedWidgetCollection(0);
 		workspace.SetupWidgets();
-		gui::text::AddLetter(50, 50, '!', &vga, 0, 0, 0);
+		gui::text::AddText(50, 50, "Hello, World!", &vga, 0, 0, 0);
 	#endif
 
 	while(1);
