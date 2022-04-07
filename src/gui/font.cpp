@@ -149,6 +149,6 @@ void gui::text::AddLetter(i32 X, i32 Y, const char letter, GraphicsContext *cont
 
 void gui::text::AddText(i32 x, i32 y, const char *str, GraphicsContext *context, u8 r, u8 g, u8 b) {
   for(int i = 0; str[i] != '\0'; i++) {
-    gui::text::AddLetter(x + (i * 9), y, str[i], context, r, g, b);
+    gui::text::AddLetter(x + (i * 8), y, str[i], context, r, g, b);
   }
 }
