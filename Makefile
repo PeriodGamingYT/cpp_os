@@ -13,10 +13,10 @@ objects = \
 	obj/drivers/keyboard.o \
 	obj/drivers/mouse.o \
 	obj/drivers/vga.o \
-	obj/gui/font.o \
 	obj/gui/widget.o \
 	obj/gui/rectangle.o \
 	obj/gui/button.o \
+	obj/gui/text.o \
 	obj/kernel.o
 
 obj/%.o: src/%.cpp

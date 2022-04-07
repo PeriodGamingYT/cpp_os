@@ -6,10 +6,10 @@
 #include <drivers/keyboard.h>
 #include <drivers/mouse.h>
 #include <drivers/vga.h>
-#include <gui/font.h>
 #include <gui/widget.h>
 #include <gui/rectangle.h>
 #include <gui/button.h>
+#include <gui/text.h>
 #define GRAPHICS_MODE
 
 static u8 x = 0, y = 0;
@@ -166,9 +166,9 @@ extern "C" void kernelMain(void *multiboot_structure, unsigned int magic_number)
 		gui::WidgetCollection workspace(&desktop);
 		gui::Rectangle rectangle(&workspace, 5, 30, 50, 10, 0, 0xA8, 0);
 		gui::Button button(&workspace, 5, 5, 50, 10, 0xA8, 0, 0);
+		gui::Text text(&workspace, 50, 50, 0, 0, 0, "Hello, World!");
 		desktop.ChangeFocusedWidgetCollection(0);
 		workspace.SetupWidgets();
-		gui::text::AddText(50, 50, "Hello, World!", &vga, 0, 0, 0);
 	#endif
 
 	while(1);

@@ -125,3 +125,38 @@ void VideoGraphicsArray::FillRectangle(i32 x, i32 y, i32 width, i32 height, u8 r
     }
   }
 }
+
+
+
+void VideoGraphicsArray::PutTextLetter(i16 X, i16 Y, const char letter, u8 r, u8 g, u8 b) {
+  if(X < 0 || Y < 0 || X > 320 || Y > 200 || letter > 128) {
+    return;
+  }
+
+  for(int y = 0; y < 8; y++) {
+    for(int x = 0; x < 8; x++) {
+      if((VideoGraphicsArray::letters[letter][y] >> x) & 1 == 1) {
+        PutPixel(x + X, y + Y, r, g, b);
+      }
+    }
+  }
+}
+
+void VideoGraphicsArray::PutText(i16 x, i16 y, const char *str, u8 r, u8 g, u8 b) {
+  for(int i = 0; str[i] != '\0'; i++) {
+    VideoGraphicsArray::PutTextLetter(x + (i * 8), y, str[i], r, g, b);
+  }
+}
+
+void VideoGraphicsArray::PutTextPixel(i16 x, i16 y, const char *str, int stringSize, u8 r, u8 g, u8 b, i16 brokenX, i16 brokenY) {
+  if(
+      brokenX >= x &&
+      brokenY >= y &&
+      brokenX <= x + (stringSize * 8) &&
+      brokenY <= y + 8 &&
+      str[(brokenX - x) / 8] <= 128 &&
+      (VideoGraphicsArray::letters[str[(brokenX - x) / 8]][brokenY - y] >> ((brokenX - x) % 8)) & 1 == 1
+    ) {
+    PutPixel(brokenX, brokenY, r, g, b);
+  }
+}
