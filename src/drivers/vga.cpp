@@ -50,7 +50,7 @@ u8 *VideoGraphicsArray::GetFrameBufferSegment() {
   }
 }
 
-void VideoGraphicsArray::PutPixel(i32 x, i32 y, u8 colorCode) {
+void VideoGraphicsArray::PutPixel(i16 x, i16 y, u8 colorCode) {
   if(x < 0 || y < 0 || x > 320 || y > 200) {
     return;
   }
@@ -59,12 +59,39 @@ void VideoGraphicsArray::PutPixel(i32 x, i32 y, u8 colorCode) {
   *pixelAddress = colorCode;
 }
 
-u8 VideoGraphicsArray::GetColorIndex(u32 r, u32 g, u32 b) {
-  if(r == 0x00 && g == 0x00 && b == 0x00) return 0x00; // black
-  if(r == 0x00 && g == 0x00 && b == 0xA8) return 0x01; // blue
-  if(r == 0x00 && g == 0xA8 && b == 0x00) return 0x02; // green
-  if(r == 0xA8 && g == 0x00 && b == 0x00) return 0x04; // red
-  if(r == 0xFF && g == 0xFF && b == 0xFF) return 0x3F; // white
+u8 VideoGraphicsArray::GetPixelCode(i16 x, i16 y) {
+  if(x < 0 || y < 0 || x > 320 || y > 200) {
+    return 0;
+  }
+
+  u8 *pixelAddress = GetFrameBufferSegment() + ((320 * y) + x);
+  return *pixelAddress;
+}
+
+u8 VideoGraphicsArray::GetPixelR(u8 colorCode) {
+  return vgaToRgb[colorCode][0];
+}
+
+u8 VideoGraphicsArray::GetPixelG(u8 colorCode) {
+  return vgaToRgb[colorCode][1];
+}
+
+u8 VideoGraphicsArray::GetPixelB(u8 colorCode) {
+  return vgaToRgb[colorCode][2];
+}
+
+// If someone can replace this please do so.
+u8 VideoGraphicsArray::GetColorIndex(u8 r, u8 g, u8 b) {
+  for(int i = 0; i < 256; i++) {
+    if(
+      vgaToRgb[i][0] == r &&
+      vgaToRgb[i][1] == g &&
+      vgaToRgb[i][2] == b
+    ) {
+      return i;
+    }
+  }
+
   return 0x00;
 }
 
@@ -114,14 +141,14 @@ bool VideoGraphicsArray::SetMode(u32 width, u32 height, u32 colorDepth) {
   return true;
 }
 
-void VideoGraphicsArray::PutPixel(i32 x, i32 y, u8 r, u8 g, u8 b) {
+void VideoGraphicsArray::PutPixel(i16 x, i16 y, u8 r, u8 g, u8 b) {
   PutPixel(x, y, GetColorIndex(r, g, b));
 }
 
-void VideoGraphicsArray::FillRectangle(i32 x, i32 y, i32 width, i32 height, u8 r, u8 g, u8 b) {
-  for(i32 Y = 0; Y < height; Y++) {
-    for(i32 X = 0; X < width; X++) {
-      PutPixel(X+x, Y+y, r, g, b);
+void VideoGraphicsArray::FillRectangle(i16 x, i16 y, i16 width, i16 height, u8 r, u8 g, u8 b) {
+  for(i16 Y = 0; Y < height; Y++) {
+    for(i16 X = 0; X < width; X++) {
+      PutPixel(X + x, Y + y, r, g, b);
     }
   }
 }

@@ -137,7 +137,7 @@ extern "C" void kernelMain(void *multiboot_structure, unsigned int magic_number)
 	#ifdef GRAPHICS_MODE
 		drivers::VideoGraphicsArray vga;
 		vga.SetMode(320, 200, 8);
-		gui::MasterWidget desktop(&vga, 0, 0, 0xA8);
+		gui::MasterWidget desktop(&vga, 0x00, 0x00, 0x00);
 	#endif
 
 	drivers::DriverManager driverManager;
@@ -164,9 +164,7 @@ extern "C" void kernelMain(void *multiboot_structure, unsigned int magic_number)
 	interrupts.Activate();
 	#ifdef GRAPHICS_MODE
 		gui::WidgetCollection workspace(&desktop);
-		gui::Rectangle rectangle(&workspace, 5, 30, 50, 10, 0, 0xA8, 0);
-		gui::Button button(&workspace, 5, 5, 50, 10, 0xA8, 0, 0);
-		gui::Text text(&workspace, 50, 50, 0, 0, 0, "Hello, World!");
+		gui::Text text(&workspace, 0, 0, 0xFF, 0xFF, 0xFF, "Hello, World!");
 		desktop.ChangeFocusedWidgetCollection(0);
 		workspace.SetupWidgets();
 	#endif

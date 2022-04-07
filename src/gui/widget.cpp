@@ -149,7 +149,14 @@ void WidgetCollection::OnMouseMove(i16 oldX, i16 oldY, i16 x, i16 y, u8 r, u8 g,
   int index = GetWidgetFromMouse(oldX, oldY);
   context->PutPixel(oldX, oldY, r, g, b);
   if(index != -1) widgets[index]->OnMouseMove(oldX, oldY, x, y);
-  context->PutPixel(x, y, 0xFF, 0xFF, 0xFF);
+  u8 colorCode = context->GetPixelCode(x, y);
+  context->PutPixel(
+    x,
+    y,
+    ~context->GetPixelR(colorCode),
+    ~context->GetPixelG(colorCode),
+    ~context->GetPixelB(colorCode)
+  );
 }
 
 void WidgetCollection::OnMouseDown(i16 x, i16 y, u8 button) {
