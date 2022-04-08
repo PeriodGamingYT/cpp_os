@@ -146,6 +146,10 @@ void VideoGraphicsArray::PutPixel(i16 x, i16 y, u8 r, u8 g, u8 b) {
 }
 
 void VideoGraphicsArray::FillRectangle(i16 x, i16 y, i16 width, i16 height, u8 r, u8 g, u8 b) {
+  if(x < 0 || y < 0 || x + width > 320 || y + height > 200) {
+    return;
+  }
+
   for(i16 Y = 0; Y < height; Y++) {
     for(i16 X = 0; X < width; X++) {
       PutPixel(X + x, Y + y, r, g, b);

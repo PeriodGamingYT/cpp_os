@@ -28,6 +28,8 @@ void Button::OnMouseMove(i16 oldX, i16 oldY, i16 x, i16 y) {
   } else {
     context->PutPixel(oldX, oldY, r, g, b);
   }
+
+  OnButtonHover(x, y);
 }
 
 void Button::OnMouseDown(i16 x, i16 y, u8 button) {
@@ -37,6 +39,7 @@ void Button::OnMouseDown(i16 x, i16 y, u8 button) {
     context->FillRectangle(this->x, this->y + h - 1, w, 1, ~r, ~g, ~b);
     context->FillRectangle(this->x, this->y + 1, 1, h - 2, ~r, ~g, ~b);
     context->FillRectangle(this->x + w - 1, this->y + 1, 1, h - 2, ~r, ~g, ~b);
+    OnButtonDown();
   }
 }
 
@@ -47,5 +50,10 @@ void Button::OnMouseUp(i16 x, i16 y, u8 button) {
     context->FillRectangle(this->x, this->y + h - 1, w, 1, r, g, b);
     context->FillRectangle(this->x, this->y + 1, 1, h - 2, r, g, b);
     context->FillRectangle(this->x + w - 1, this->y + 1, 1, h - 2, r, g, b);
+    OnButtonUp();
   }
 }
+
+void Button::OnButtonDown() {}
+void Button::OnButtonUp() {}
+void Button::OnButtonHover(i16 x, i16 y) {}

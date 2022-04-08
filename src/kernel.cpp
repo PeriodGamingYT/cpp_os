@@ -137,12 +137,12 @@ extern "C" void kernelMain(void *multiboot_structure, unsigned int magic_number)
 	#ifdef GRAPHICS_MODE
 		drivers::VideoGraphicsArray vga;
 		vga.SetMode(320, 200, 8);
-		gui::MasterWidget desktop(&vga, 0x00, 0x00, 0x00);
+		gui::MasterWidget master(&vga, 0x00, 0x00, 0x00);
 	#endif
 
 	drivers::DriverManager driverManager;
 	#ifdef GRAPHICS_MODE
-		drivers::KeyboardDriver keyboard(&interrupts, &desktop);
+		drivers::KeyboardDriver keyboard(&interrupts, &master);
 	#else
 		PrintfKeyboardEventHandler keyboardHandler;
 		drivers::KeyboardDriver keyboard(&interrupts, &keyboardHandler);
@@ -150,7 +150,7 @@ extern "C" void kernelMain(void *multiboot_structure, unsigned int magic_number)
 
 	driverManager.AddDriver(&keyboard);
 	#ifdef GRAPHICS_MODE
-		drivers::MouseDriver mouse(&interrupts, &desktop);
+		drivers::MouseDriver mouse(&interrupts, &master);
 	#else
 		PrintfMouseEventHandler mouseHandler;
 		drivers::MouseDriver mouse(&interrupts, &mouseHandler);
@@ -163,10 +163,8 @@ extern "C" void kernelMain(void *multiboot_structure, unsigned int magic_number)
 	driverManager.ActivateAll();
 	interrupts.Activate();
 	#ifdef GRAPHICS_MODE
-		gui::WidgetCollection workspace(&desktop);
-		gui::Text text(&workspace, 0, 0, 0xFF, 0xFF, 0xFF, "Hello, World!");
-		desktop.ChangeFocusedWidgetCollection(0);
-		workspace.SetupWidgets();
+		gui::WidgetCollection desktop(&master);
+		master.ChangeFocusedWidgetCollection(0);
 	#endif
 
 	while(1);

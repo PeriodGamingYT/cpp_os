@@ -14,6 +14,9 @@ namespace gui {
       void OnMouseMove(i16 oldX, i16 oldY, i16 x, i16 y);
       void OnMouseDown(i16 x, i16 y, u8 button);
       void OnMouseUp(i16 x, i16 y, u8 button);
+      virtual void OnButtonDown();
+      virtual void OnButtonUp();
+      virtual void OnButtonHover(i16 x, i16 y);
   };
 }
 

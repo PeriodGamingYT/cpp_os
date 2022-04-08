@@ -17,6 +17,7 @@ objects = \
 	obj/gui/rectangle.o \
 	obj/gui/button.o \
 	obj/gui/text.o \
+	obj/desktop/dock.o \
 	obj/kernel.o
 
 obj/%.o: src/%.cpp
@@ -49,6 +50,10 @@ mykernel.iso: mykernel.bin
 	rm -rf iso
 	
 run: mykernel.iso
+	(killall VirtualBoxVM && sleep 1) || true
+	VirtualBoxVM --startvm myos &
+
+vmr:
 	(killall VirtualBoxVM && sleep 1) || true
 	VirtualBoxVM --startvm myos &
 
