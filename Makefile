@@ -17,7 +17,6 @@ objects = \
 	obj/gui/rectangle.o \
 	obj/gui/button.o \
 	obj/gui/text.o \
-	obj/desktop/dock.o \
 	obj/kernel.o
 
 obj/%.o: src/%.cpp

@@ -164,6 +164,7 @@ extern "C" void kernelMain(void *multiboot_structure, unsigned int magic_number)
 	interrupts.Activate();
 	#ifdef GRAPHICS_MODE
 		gui::WidgetCollection desktop(&master);
+		gui::Text helloWorldText(&desktop, 1, 1, 255, 255, 255, "Hello, World!");
 		master.ChangeFocusedWidgetCollection(0);
 	#endif
 
