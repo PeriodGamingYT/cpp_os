@@ -49,12 +49,7 @@ mykernel.iso: mykernel.bin
 	rm -rf iso
 	
 run: mykernel.iso
-	(killall VirtualBoxVM && sleep 1) || true
-	VirtualBoxVM --startvm myos &
-
-vmr:
-	(killall VirtualBoxVM && sleep 1) || true
-	VirtualBoxVM --startvm myos &
+	qemu-system-x86_64 mykernel.iso
 
 .PHONY: clean
 clean:
